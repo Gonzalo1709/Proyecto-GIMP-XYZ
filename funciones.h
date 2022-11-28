@@ -121,6 +121,182 @@ int eliminar_figura(){
     return id;
 }
 
+void rotar(){
+    int id, rotacion;
+    imprimir_tabla();
+    cout << "Que triangulo desea rotar?" << endl;
+    cin >> id;
+    cout << "Ingrese el angulo de rotacion: (90/180/270/360/-90/-180/-270/-360)" << endl;
+    cin >> rotacion;
+    if (pizarra->get_figuras()[id-1]->get_nombre_figura() != "Triangulo") {
+        cout << "No se puede rotar una figura que no sea un triangulo" << endl;
+        return;
+    }
+
+    int rotaciones = 0;
+
+    if (rotacion == 90 || rotacion == -270) {
+        rotaciones = 1;
+    } else if (rotacion == 180 || rotacion == -180) {
+        rotaciones = 2;
+    } else if (rotacion == 270 || rotacion == -90) {
+        rotaciones = 3;
+    } else {
+        cout << "Angulo invalido" << endl;
+        return;
+    }
+
+
+    for(int rotacion_act = 0; rotacion_act < rotaciones; rotacion_act++){
+        Coordenada esquina0 = *pizarra->get_figuras()[id-1]->get_coordenadas()[0];
+        Coordenada esquina1 = *pizarra->get_figuras()[id-1]->get_coordenadas()[1];
+        Coordenada esquina2 = *pizarra->get_figuras()[id-1]->get_coordenadas()[2];
+        vector<Coordenada*> nuevas_coords;
+
+        /* debug*/
+        cout << "ants del cambio" << endl;
+        cout << "#0 y: " << esquina0.get_y() << " x: " << esquina0.get_x() << endl;
+        cout << "#1 y:" << esquina1.get_y() << " x: " << esquina1.get_x() << endl;
+        cout << "#2 y:" << esquina2.get_y() << " x: " << esquina2.get_x() << endl;
+        /**/
+
+        int otro_y = 0;
+        int x_menor = 20;
+
+        for (int i = 0; i < 3; i++) {
+            if(pizarra->get_figuras()[id-1]->get_coordenadas()[i]->get_x() < x_menor){
+                x_menor = pizarra->get_figuras()[id-1]->get_coordenadas()[i]->get_x();
+            }
+        }
+
+        if(esquina0.get_y() == esquina1.get_y()) {
+            otro_y = 2;
+        }
+        else if(esquina0.get_y() == esquina2.get_y()) {
+            otro_y = 1;
+        }
+        else {
+            otro_y = 0;
+        }
+
+        if (pizarra->get_figuras()[id-1]->get_coordenadas()[otro_y]->get_y() != esquina0.get_y()) {
+            Coordenada temporal_otro_y(pizarra->get_figuras()[id - 1]->get_coordenadas()[otro_y]->get_x(),
+                                       pizarra->get_figuras()[id - 1]->get_coordenadas()[otro_y]->get_y());
+            Coordenada temporal_para_cambiar = esquina0;
+
+            esquina0.set_x(temporal_otro_y.get_x());
+            esquina0.set_y(temporal_otro_y.get_y());
+            if (otro_y == 1){
+                esquina1.set_x(temporal_para_cambiar.get_x());
+                esquina1.set_y(temporal_para_cambiar.get_y());
+            } else {
+                esquina2.set_x(temporal_para_cambiar.get_x());
+                esquina2.set_y(temporal_para_cambiar.get_y());
+            }
+        }
+
+        /* Debug */
+        cout << "dsps del cambio" << endl;
+        cout << "#0 y: " << esquina0.get_y() << " x: " << esquina0.get_x() << endl;
+        cout << "#1 y:" << esquina1.get_y() << " x: " << esquina1.get_x() << endl;
+        cout << "#2 y:" << esquina2.get_y() << " x: " << esquina2.get_x() << endl;
+        /**/
+
+        if(esquina0.get_y() < esquina1.get_y() && esquina0.get_x() > x_menor){
+            //   0
+            // * *
+            nuevas_coords.push_back(new Coordenada(esquina0.get_x(), esquina0.get_y()));
+            if (esquina1.get_x() > esquina2.get_x()) {
+                //   0
+                // 2 1
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina1.get_y()));
+                cout << "1" << endl;
+                // Se usa el y de 0
+                // 2 0
+                //   1
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina0.get_y()));
+            } else{
+                cout << "2" << endl;
+                //   0
+                // 1 2
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina2.get_y()));
+                // Se usa el y de 0
+                // 1 0
+                //   2
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina0.get_y()));
+            }
+        }
+        else if(esquina0.get_y() < esquina1.get_y() && esquina0.get_x() == x_menor){
+            // 0
+            // * *
+
+            nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina1.get_y()));
+            nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina2.get_y()));
+            if (esquina1.get_x() > x_menor){
+                cout << "3" << endl;
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina0.get_y()));
+            }
+            else{
+                cout << "4" << endl;
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina0.get_y()));
+            }
+        }
+
+        else if(esquina0.get_y() > esquina1.get_y() && esquina0.get_x() > x_menor){
+            // * *
+            //   0
+            if (esquina1.get_x() == x_menor){
+                // 1 2
+                //   0
+                cout << "5" << endl;
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina0.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina1.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina0.get_x(), esquina1.get_y()));
+            }
+            else if (esquina2.get_x() == x_menor){
+                // 2 1
+                //   0
+                cout << "6" << endl;
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina0.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina2.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina0.get_x(), esquina2.get_y()));
+            }
+        }
+
+        else if(esquina0.get_y() > esquina1.get_y() && esquina0.get_x() == x_menor){
+            // *
+            // 0 *
+            if (esquina1.get_x() == x_menor){
+                // 1
+                // 0 2
+                cout << "7" << endl;
+                nuevas_coords.push_back(new Coordenada(esquina0.get_x(), esquina0.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina1.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina2.get_x(), esquina2.get_y()));
+            }
+            else if (esquina1.get_x() > x_menor){
+                // 2
+                // 0 1
+                cout << "8" << endl;
+                nuevas_coords.push_back(new Coordenada(esquina0.get_x(), esquina0.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina2.get_y()));
+                nuevas_coords.push_back(new Coordenada(esquina1.get_x(), esquina1.get_y()));
+            }
+        }
+        else {cout << "No funciono" << endl; return;}
+
+        cout << "Nuevas coordenadas" << endl;
+        for (int i = 0; i < 3; i++){
+            cout << "y: " << nuevas_coords[i]->get_y() << " x: " << nuevas_coords[i]->get_x() << endl;
+        }
+        pizarra->set_figura(new Triangulo(nuevas_coords));
+        pizarra->eliminar_figura(id-1);
+
+    }
+
+}
+
+
 void redimensionar_figura() {
     int id;
     int mult;
@@ -180,7 +356,7 @@ void redimensionar_figura() {
         }
         if (valido) {
             pizarra->set_figura(new CRectangulo(coordenadas_nuevas));
-            pizarra->eliminar_figura(id);
+            pizarra->eliminar_figura(id-1);
         }
 
     }

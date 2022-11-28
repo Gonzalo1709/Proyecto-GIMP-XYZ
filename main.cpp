@@ -21,7 +21,7 @@ int main() {
                 eliminar_figura();
                 break;
             case 3:
-                // girar()
+                rotar();
                 break;
             case 4:
                 redimensionar_figura();
